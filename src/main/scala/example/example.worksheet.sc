@@ -106,6 +106,11 @@ sum(f_,1,3)
 
 def f(a: String)(b: Int)(c: Boolean): String =
   "(" + a + ", " + b + ", " + c + ")"
+
+val g =f("Hi")
+val h = g(2)
+val i = h(false)
+println(i)
 print(f("Hello")(1)(true))
 
 /*
@@ -115,8 +120,8 @@ Classes and objects
 /*---------------------           rational class       -----------------------------*/
 
 class Rational(x:Int, y:Int):
-  def numer = x
-  def denom = y
+  val numer = x
+  val denom = y
 
   def addRational(r:Rational):Rational =
     Rational(this.numer*r.denom+this.denom*r.numer,this.denom*r.denom)
@@ -147,7 +152,7 @@ class Rationals(x:Int, y:Int):
   def denom = y/g
 
   def less(that:Rationals):Boolean =
-    this.numer*that.denom < this.denom+that.numer
+    numer*that.denom < denom+that.numer
 
   def max(that:Rationals):Rationals =
     if this.less(that) then that else this

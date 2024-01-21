@@ -1,3 +1,5 @@
+import scala.annotation.tailrec
+
 /*
 Functional programming
 */
@@ -27,37 +29,59 @@ def sqrtIter(number:Double) = {
 
   def calculateMean(number: Double, estimation: Double): Double = {
     val mean:Double = (estimation + number / estimation) / 2
-    println("mean is: "+mean)
-    println("mean-estimation: "+abs(mean-estimation))
     if abs(mean-estimation) <0.01 then mean else calculateMean(number :Double,mean:Double)
-
   }
 }
-
 val sqrt = sqrtIter(-9)
 println("sqrt of above number is "+sqrt)
-
-// calculating GCD
-
-def gcd(x: Int, y:Int):Int =
-  if y==0 then
-    x
-  else
-    gcd(y,x%y)
-
-println(gcd(6,2))
 
 // calculating factorial
 
 def factorial(x:Int):Int =
   if x==0 then 1 else x*factorial(x-1)
-
 println(factorial(5))
+
+def fact(n: Int): BigInt = {
+  @tailrec
+  def iter(a: Int, acc: Int): Int={
+    if a <= 1 then acc else iter(a-1,acc*a)
+  }
+  iter(n, 1)
+}
+println(fact(20))
+
+// calculating fibonacci
+
+def fibRecursive(n: Int): Int = {
+  if (n <= 1) n
+  else fibRecursive(n - 1) + fibRecursive(n - 2)
+}
+println(fibRecursive(3))
+
+@tailrec
+def fibNum(a: Int, b: Int , previous: Int): Int = {
+  val acc=b+previous // 1
+  if a==0 then acc else fibNum(a-1, previous, acc)
+}
+println(fibNum(9, 0, 1))
+
+
+
+// calculating GCD
+
+@tailrec
+def gcd(x: Int, y:Int):Int =
+  if y==0 then
+    x
+  else
+    gcd(y,x%y)
+println(gcd(6,2))
+
+
+/*---------------------           currying       -----------------------------*/
 
 def cube(a:Int):Int =
   a*a*a
-
-/*---------------------           currying       -----------------------------*/
 
 def sumInts(a:Int, b:Int):Int =
   if a>b then 0 else a+sumInts(a+1,b)
@@ -119,12 +143,14 @@ Classes and objects
 
 /*---------------------           rational class       -----------------------------*/
 
-class Rational(x:Int, y:Int):
-  val numer = x
+class Rational(x:Int, var y:Int):
+  def numer = x
   val denom = y
 
   def addRational(r:Rational):Rational =
-    Rational(this.numer*r.denom+this.denom*r.numer,this.denom*r.denom)
+    Rational(this.x*r.denom+this.y*r.numer,this.y*r.denom)
+    //Rational(this.x*r.y+this.y*r.x,this.y*r.y)
+    // we can directly use x, y parameter if we case classes
 
   def neg():Rational=
     Rational(-1*numer,this.denom)
@@ -141,7 +167,7 @@ println("neg Rational: "+x.neg())
 
 /* ---------------------             abstraction        ----------------------------- */
 
-class Rationals(x:Int, y:Int):
+class Rationals( x:Int, y:Int):
   require(y>0, "denom must be possitive")
 
   private def gcd(a:Int, b:Int):Int =
@@ -198,7 +224,7 @@ abstract class IntSet:               // class is abstract
 
 class Empty extends IntSet:
   def contains(x: Int): Boolean = false
-  override def incl(x: Int): IntSet = ??? // override key word is for the already implemented method in super class
+  override def incl(x: Int): IntSet = NonEmpty(x, Empty(), Empty()) // override key word is for the already implemented method in super class
 
 
 class NonEmpty(element: Int, left: IntSet, right: IntSet) extends IntSet:
@@ -270,4 +296,40 @@ def singleton[T](elem: T) =
 // we can then write
 val a = singleton[Int](1)
 val b = singleton(true)
+
+// Decomposition
+
+trait Expr:
+  def isNumber: Boolean
+  def isSum:Boolean
+  def leftOper: Expr
+  def rightOper: Expr
+  def numValue: Int
+
+class Number(n: Int) extends Expr:
+  def isNumber: Boolean = true
+  def isSum: Boolean = false
+  def leftOper: Expr = throw Error("Number.leftOp")
+  def rightOper: Expr = throw Error("Number.rightOper")
+  def numValue: Int = n
+
+class isSum(e1: Expr, e2: Expr) extends Expr:
+  def isNumber: Boolean = false
+  def isSum: Boolean = true
+  def leftOper: Expr = e1
+  def rightOper: Expr = e2
+  def numValue: Int = throw Error("Sum.numValue")
+
+
+//def fibNum(n: Int): Int = {
+//  def acc(a : Int, b: Int= 0): Int = {
+//    val initial = 1
+//    val value = b + initial
+//    if a <= n then 0 else acc(value, b)
+//  }
+//  acc(5)
+//}
+//
+//fibNum(5)
+
 

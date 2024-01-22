@@ -4,6 +4,7 @@ import scala.annotation.tailrec
 Functional programming
 */
 
+
 // pascal triangle
 
 println("pascal triangle")
@@ -11,6 +12,7 @@ println("pascal triangle")
 def pascal(c:Int, r: Int):Int =
   if c == 0 || c == r then 1 else pascal(c-1,r-1)+pascal(c,r-1)
 println(pascal(3,3))
+
 
 // calculating square root using the concepts of recursion
 
@@ -27,6 +29,7 @@ def sqrtIter(number:Double) = {
   else
     val result :Double = calculateMean(number, estimation)
 
+  @tailrec
   def calculateMean(number: Double, estimation: Double): Double = {
     val mean:Double = (estimation + number / estimation) / 2
     if abs(mean-estimation) <0.01 then mean else calculateMean(number :Double,mean:Double)
@@ -34,6 +37,7 @@ def sqrtIter(number:Double) = {
 }
 val sqrt = sqrtIter(-9)
 println("sqrt of above number is "+sqrt)
+
 
 // calculating factorial
 
@@ -50,21 +54,21 @@ def fact(n: Int): BigInt = {
 }
 println(fact(20))
 
+
 // calculating fibonacci
 
 def fibRecursive(n: Int): Int = {
   if (n <= 1) n
   else fibRecursive(n - 1) + fibRecursive(n - 2)
 }
-println(fibRecursive(3))
+//println(fibRecursive(3))
 
 @tailrec
 def fibNum(a: Int, b: Int , previous: Int): Int = {
   val acc=b+previous // 1
   if a==0 then acc else fibNum(a-1, previous, acc)
 }
-println(fibNum(9, 0, 1))
-
+//println(fibNum(9, 0, 1))
 
 
 // calculating GCD
@@ -77,6 +81,22 @@ def gcd(x: Int, y:Int):Int =
     gcd(y,x%y)
 println(gcd(6,2))
 
+// palindrome
+
+def palindrome(a: Int): Boolean = {
+  @tailrec
+  def revTail(a: Int, b: Int = 0): Int = {
+    val denom = a % 10
+    val remainedNum = a / 10
+    val rev = b * 10 + denom
+    //println("rev : " + rev.toString())
+    if remainedNum <= 9 then rev * 10 + remainedNum else revTail(remainedNum, rev)
+  }
+  val rev = revTail(a)
+  rev == a
+}
+
+println(palindrome(12021))
 
 /*---------------------           currying       -----------------------------*/
 
@@ -104,6 +124,7 @@ println("complex of sumCubes: "+sum(sumCubes,2,4))
 println("complex of sumFactorials: "+sum(sumFactorial,2,4))
 
 // curried
+
 def sum(f:Int => Int):(Int, Int)=> Int =
   def sumF(a: Int, b: Int): Int =
     if a>b then 0 else f(a) + sumF(a+1,b)
@@ -212,6 +233,7 @@ println(Rationals(1,2) min Rationals(2,3)) // infix notation
 //                    /  \
 //                  emp   emp
 
+
 abstract class IntSet:               // class is abstract
   def contains(x:Int):Boolean        // no implementation of contains or incl
   def incl(x:Int): IntSet
@@ -273,7 +295,8 @@ class Nil_[T] extends List[T]:
   def head = throw new NoSuchElementException("Nil.head")
   def tail = throw new NoSuchElementException("Nil.tail")
 
-def nth[T](xs:List[T], n: Int ): T =
+@tailrec
+def nth[T](xs:List[T], n: Int): T =
   if xs.isempty then throw IndexOutOfBoundsException()
   else if n == 0 then xs.head
   else nth(xs.tail,n-1)
@@ -321,15 +344,5 @@ class isSum(e1: Expr, e2: Expr) extends Expr:
   def numValue: Int = throw Error("Sum.numValue")
 
 
-//def fibNum(n: Int): Int = {
-//  def acc(a : Int, b: Int= 0): Int = {
-//    val initial = 1
-//    val value = b + initial
-//    if a <= n then 0 else acc(value, b)
-//  }
-//  acc(5)
-//}
-//
-//fibNum(5)
 
 
